@@ -3,21 +3,23 @@ import { motion } from "framer-motion";
 import { Flame, Target, Clock, TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from "recharts";
 import GlassCard from "@/components/GlassCard";
-import { defaultFinancials, calculateFIRE, formatINR } from "@/lib/finance";
+import { calculateFIRE, formatINR } from "@/lib/finance";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { Slider } from "@/components/ui/slider";
 
 export default function FirePlanner() {
+  const { financials } = useFinancialProfile();
   const [sipMultiplier, setSipMultiplier] = useState(1);
   const [expenseReduction, setExpenseReduction] = useState(0);
 
   const adjusted = useMemo(() => ({
-    ...defaultFinancials,
-    monthlySIP: defaultFinancials.monthlySIP * sipMultiplier,
-    monthlyExpenses: defaultFinancials.monthlyExpenses - expenseReduction,
-  }), [sipMultiplier, expenseReduction]);
+    ...financials,
+    monthlySIP: financials.monthlySIP * sipMultiplier,
+    monthlyExpenses: financials.monthlyExpenses - expenseReduction,
+  }), [financials, sipMultiplier, expenseReduction]);
 
   const fire = useMemo(() => calculateFIRE(adjusted), [adjusted]);
-  const baseFire = useMemo(() => calculateFIRE(defaultFinancials), []);
+  const baseFire = useMemo(() => calculateFIRE(financials), [financials]);
 
   const stats = [
     { label: "FIRE Number", value: formatINR(fire.fireNumber), icon: Target, sub: "25× annual expenses" },

@@ -2,17 +2,19 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Milestone, ArrowRight, TrendingDown, TrendingUp } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
-import { defaultFinancials, lifeEvents, analyzeFinancials, formatINR, type LifeEvent } from "@/lib/finance";
+import { lifeEvents, analyzeFinancials, formatINR, type LifeEvent } from "@/lib/finance";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 
 export default function LifeEvents() {
+  const { financials } = useFinancialProfile();
   const [selected, setSelected] = useState<LifeEvent | null>(null);
 
-  const before = useMemo(() => analyzeFinancials(defaultFinancials), []);
+  const before = useMemo(() => analyzeFinancials(financials), [financials]);
 
   const after = useMemo(() => {
     if (!selected) return null;
     return analyzeFinancials({
-      ...defaultFinancials,
+      ...financials,
       totalSavings: defaultFinancials.totalSavings - selected.cost,
       monthlyExpenses: defaultFinancials.monthlyExpenses + selected.monthlyImpact,
     });
