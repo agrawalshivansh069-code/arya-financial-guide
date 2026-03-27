@@ -1,16 +1,43 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, AlertTriangle, Zap } from "lucide-react";
+import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, AlertTriangle, Zap, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
 import InsightBadge from "@/components/InsightBadge";
-import { defaultFinancials, analyzeFinancials, formatINR } from "@/lib/finance";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { analyzeFinancials, formatINR } from "@/lib/finance";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const riskColors = { Low: "text-success", Medium: "text-warning", High: "text-destructive" };
+const riskBadge = { Low: "bg-success/15 text-success border-success/30", Medium: "bg-warning/15 text-warning border-warning/30", High: "bg-destructive/15 text-destructive border-destructive/30" };
 
 export default function Dashboard() {
-  const analysis = useMemo(() => analyzeFinancials(defaultFinancials), []);
-  const f = defaultFinancials;
+  const { financials, hasProfile, loading } = useFinancialProfile();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const analysis = useMemo(() => analyzeFinancials(financials), [financials]);
+  const f = financials;
+
+  // Redirect to onboarding if no profile
+  if (!loading && hasProfile === false) {
+    navigate("/onboarding", { replace: true });
+    return null;
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const overspend = f.monthlyExpenses - f.monthlyIncome * 0.5;
+  const potentialSIPGain = (f.monthlyIncome * 0.3 - f.monthlySIP) * 12;
 
   const metrics = [
     { label: "Net Worth", value: formatINR(analysis.netWorth), icon: Wallet, trend: "+12.4%", up: true },
@@ -22,9 +49,37 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="font-display text-2xl font-bold text-foreground">Smart Dashboard</h2>
+        <h2 className="font-display text-2xl font-bold text-foreground">
+          Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""} 👋
+        </h2>
         <p className="text-sm text-muted-foreground mt-1">Your financial command center</p>
       </motion.div>
+
+      {/* Insight Banner */}
+      {overspend > 0 && (
+        <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
+          className="p-4 rounded-xl border border-warning/30 bg-warning/10 flex items-center justify-between"
+        >
+          <div>
+            <p className="text-sm font-semibold text-warning">⚠️ You are overspending by {formatINR(overspend * 12)}/year</p>
+            <p className="text-xs text-warning/70 mt-0.5">Your expenses exceed the 50% benchmark — reduce discretionary spending</p>
+          </div>
+          <Badge className="bg-warning/20 text-warning border-warning/30">Action Needed</Badge>
+        </motion.div>
+      )}
+      {potentialSIPGain > 0 && (
+        <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
+          className="p-4 rounded-xl border border-primary/30 bg-primary/10 flex items-center justify-between"
+        >
+          <div>
+            <p className="text-sm font-semibold text-primary">🚀 Increase SIP by {formatINR(potentialSIPGain / 12)}/mo → retire earlier</p>
+            <p className="text-xs text-primary/70 mt-0.5">You could invest {formatINR(potentialSIPGain)} more per year</p>
+          </div>
+          <Button size="sm" variant="outline" className="border-primary/30 text-primary" onClick={() => navigate("/fire")}>
+            Plan <ArrowRight className="w-3 h-3 ml-1" />
+          </Button>
+        </motion.div>
+      )}
 
       {/* Metric cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -52,7 +107,9 @@ export default function Dashboard() {
           <div className="mt-4 flex items-center gap-2">
             <Shield className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Risk Level:</span>
-            <span className={`font-semibold text-sm ${riskColors[analysis.riskLevel]}`}>{analysis.riskLevel}</span>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${riskBadge[analysis.riskLevel]}`}>
+              {analysis.riskLevel}
+            </span>
           </div>
         </GlassCard>
 
@@ -90,7 +147,7 @@ export default function Dashboard() {
         <GlassCard delay={0.55}>
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-4 h-4 text-primary" />
-            <h3 className="font-display font-semibold text-foreground">Top 3 Actions</h3>
+            <h3 className="font-display font-semibold text-foreground">🏆 Top 3 Actions</h3>
           </div>
           <ul className="space-y-2">
             {analysis.topActions.slice(0, 3).map((action, i) => (
