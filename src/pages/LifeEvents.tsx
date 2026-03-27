@@ -15,10 +15,10 @@ export default function LifeEvents() {
     if (!selected) return null;
     return analyzeFinancials({
       ...financials,
-      totalSavings: defaultFinancials.totalSavings - selected.cost,
-      monthlyExpenses: defaultFinancials.monthlyExpenses + selected.monthlyImpact,
+      totalSavings: financials.totalSavings - selected.cost,
+      monthlyExpenses: financials.monthlyExpenses + selected.monthlyImpact,
     });
-  }, [selected]);
+  }, [selected, financials]);
 
   return (
     <div className="space-y-6">

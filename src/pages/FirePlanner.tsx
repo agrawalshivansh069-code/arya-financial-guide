@@ -25,7 +25,7 @@ export default function FirePlanner() {
     { label: "FIRE Number", value: formatINR(fire.fireNumber), icon: Target, sub: "25× annual expenses" },
     { label: "Current Corpus", value: formatINR(fire.currentCorpus), icon: TrendingUp, sub: `${((fire.currentCorpus / fire.fireNumber) * 100).toFixed(1)}% achieved` },
     { label: "Gap to FIRE", value: formatINR(fire.gap), icon: Flame, sub: "Amount still needed" },
-    { label: "Years to FIRE", value: `${fire.yearsToFIRE} yrs`, icon: Clock, sub: `Retire at age ${defaultFinancials.age + fire.yearsToFIRE}` },
+    { label: "Years to FIRE", value: `${fire.yearsToFIRE} yrs`, icon: Clock, sub: `Retire at age ${financials.age + fire.yearsToFIRE}` },
   ];
 
   return (
