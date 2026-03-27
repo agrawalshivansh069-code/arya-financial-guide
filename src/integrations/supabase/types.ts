@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      financial_profiles: {
+        Row: {
+          age: number
+          created_at: string
+          expected_return: number
+          id: string
+          inflation_rate: number
+          monthly_emi: number
+          monthly_expenses: number
+          monthly_income: number
+          monthly_rent: number
+          monthly_sip: number
+          retirement_age: number
+          total_debt: number
+          total_investments: number
+          total_savings: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number
+          created_at?: string
+          expected_return?: number
+          id?: string
+          inflation_rate?: number
+          monthly_emi?: number
+          monthly_expenses?: number
+          monthly_income?: number
+          monthly_rent?: number
+          monthly_sip?: number
+          retirement_age?: number
+          total_debt?: number
+          total_investments?: number
+          total_savings?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number
+          created_at?: string
+          expected_return?: number
+          id?: string
+          inflation_rate?: number
+          monthly_emi?: number
+          monthly_expenses?: number
+          monthly_income?: number
+          monthly_rent?: number
+          monthly_sip?: number
+          retirement_age?: number
+          total_debt?: number
+          total_investments?: number
+          total_savings?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
