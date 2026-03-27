@@ -3,10 +3,12 @@ import { motion } from "framer-motion";
 import { Calculator, IndianRupee, ArrowRight } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
 import InsightBadge from "@/components/InsightBadge";
-import { defaultFinancials, calculateTax, formatINR } from "@/lib/finance";
+import { calculateTax, formatINR } from "@/lib/finance";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 
 export default function TaxAI() {
-  const tax = useMemo(() => calculateTax(defaultFinancials.monthlyIncome, 150000, 25000, 0, 0), []);
+  const { financials } = useFinancialProfile();
+  const tax = useMemo(() => calculateTax(financials.monthlyIncome, 150000, 25000, 0, 0), [financials]);
 
   return (
     <div className="space-y-6">

@@ -5,10 +5,12 @@ import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
 import MetricBar from "@/components/MetricBar";
 import InsightBadge from "@/components/InsightBadge";
-import { defaultFinancials, analyzeFinancials } from "@/lib/finance";
+import { analyzeFinancials } from "@/lib/finance";
+import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 
 export default function MoneyHealth() {
-  const analysis = useMemo(() => analyzeFinancials(defaultFinancials), []);
+  const { financials } = useFinancialProfile();
+  const analysis = useMemo(() => analyzeFinancials(financials), [financials]);
 
   const dimensions = [
     { label: "Savings Rate", value: analysis.savingsRate, max: 50, suffix: "%" },

@@ -1,12 +1,14 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard, Flame, HeartPulse, Calculator,
-  Milestone, TrendingUp, Sparkles
+  Milestone, TrendingUp, Sparkles, LogOut
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const links = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/fire", icon: Flame, label: "FIRE Planner" },
   { to: "/health", icon: HeartPulse, label: "Money Health" },
   { to: "/tax", icon: Calculator, label: "Tax AI" },
@@ -16,6 +18,13 @@ const links = [
 
 export default function AppSidebar() {
   const location = useLocation();
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-sidebar border-r border-sidebar-border flex flex-col z-50">
@@ -25,7 +34,7 @@ export default function AppSidebar() {
         </div>
         <div>
           <h1 className="font-display font-bold text-foreground text-lg leading-tight">AI Money</h1>
-          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Mentor</p>
+          <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Copilot</p>
         </div>
       </div>
 
@@ -49,6 +58,15 @@ export default function AppSidebar() {
           );
         })}
       </nav>
+
+      <div className="px-3 mb-2">
+        <div className="p-3 glass-card rounded-xl mb-3">
+          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+        </div>
+        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive" onClick={handleLogout}>
+          <LogOut className="w-4 h-4" /> Logout
+        </Button>
+      </div>
 
       <div className="p-4 mx-3 mb-4 glass-card rounded-xl">
         <p className="text-xs text-muted-foreground mb-1">Built for 🇮🇳 India</p>
