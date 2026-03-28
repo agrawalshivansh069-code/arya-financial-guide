@@ -140,7 +140,67 @@ export function analyzeFinancials(f: UserFinancials): FinancialHealth {
 
   if (topActions.length === 0) topActions.push("Stay the course — your finances are in great shape!");
 
-  return { score, savingsRate, emergencyMonths, debtRatio, investmentRate, netWorth, burnRate, riskLevel, insights, redFlags, topActions };
+  // Best Move & Worst Mistake
+  let bestMove: string;
+  let worstMistake: string;
+
+  if (savingsRate < 20) {
+    bestMove = `Cut ₹${Math.round((f.monthlyIncome * 0.3 - (f.monthlyIncome - f.monthlyExpenses)) / 1000) * 1000} from monthly expenses — this alone could make you financially free 5 years sooner.`;
+  } else if (investmentRate < 20) {
+    bestMove = `Move ${formatINR(Math.round(f.monthlyIncome * 0.2 - f.monthlySIP))} more into SIPs each month — at 12% returns, this becomes ${formatINR(Math.round((f.monthlyIncome * 0.2 - f.monthlySIP) * 12 * 15))} in 15 years.`;
+  } else if (emergencyMonths < 6) {
+    bestMove = `Park ${formatINR(Math.round(f.monthlyExpenses * 6 - f.totalSavings))} in a liquid fund to complete your 6-month emergency buffer. Sleep better at night.`;
+  } else {
+    bestMove = "You're doing remarkably well. Consider diversifying into index funds or REITs for the next level of wealth building.";
+  }
+
+  if (debtRatio > 40) {
+    worstMistake = `Taking on more debt. Your EMIs already eat ${debtRatio.toFixed(0)}% of income — one missed payment could trigger a debt spiral.`;
+  } else if (emergencyMonths < 3) {
+    worstMistake = `Not having an emergency fund. A single medical bill or job gap could force you into high-interest debt within weeks.`;
+  } else if (savingsRate < 10) {
+    worstMistake = `Continuing to spend ${formatINR(f.monthlyExpenses)}/month without a budget. At this rate, you'll have nothing saved for retirement.`;
+  } else if (monthlySurplus > 0 && f.monthlySIP === 0) {
+    worstMistake = `Keeping ${formatINR(monthlySurplus)}/month surplus in a savings account. Inflation is silently eating 6% of it every year.`;
+  } else {
+    worstMistake = "Withdrawing investments early for lifestyle upgrades — the compounding loss is much larger than you think.";
+  }
+
+  // Summary line
+  let summaryLine: string;
+  if (score >= 75) {
+    summaryLine = "Your financial health is strong — you're building wealth consistently and your risk exposure is well managed.";
+  } else if (score >= 55) {
+    summaryLine = "Your finances are stable, but you're under-investing for long-term growth. Small changes now will compound massively.";
+  } else if (score >= 35) {
+    summaryLine = "Your financial health needs attention — high expenses and low investments are putting your future at risk.";
+  } else {
+    summaryLine = "Your finances are in critical condition. Immediate action on debt and spending is essential to avoid a crisis.";
+  }
+
+  // Hero headline & subtext
+  let heroHeadline: string;
+  let heroSubtext: string;
+  if (monthlySurplus <= 0) {
+    const runwayMonths = f.totalSavings > 0 ? Math.round(f.totalSavings / Math.abs(monthlySurplus)) : 0;
+    heroHeadline = `🚨 At this pace, you'll run out of money in ${runwayMonths} months`;
+    heroSubtext = "You're spending more than you earn. Cut expenses or increase income before it's too late.";
+  } else if (score >= 70) {
+    heroHeadline = "Your finances are in great shape — keep building!";
+    heroSubtext = "Strong savings rate, healthy emergency fund, and disciplined investing. You're ahead of 90% of Indians your age.";
+  } else if (investmentRate < 15) {
+    const delayYears = Math.max(1, Math.round((20 - investmentRate) / 3));
+    heroHeadline = `⚠ Under-investing could delay your retirement by ${delayYears}+ years`;
+    heroSubtext = `Increasing your SIP by just ${formatINR(Math.round(f.monthlyIncome * 0.05))}/month could change everything.`;
+  } else if (debtRatio > 30) {
+    heroHeadline = `⚠ ${debtRatio.toFixed(0)}% of your income goes to EMIs — that's a warning sign`;
+    heroSubtext = "Focus on clearing high-interest debt first. Every rupee saved on interest is a rupee earned.";
+  } else {
+    heroHeadline = `⚠ Your financial health score is ${Math.round(score)}/100 — room for improvement`;
+    heroSubtext = "A few targeted changes to your savings and investment habits can significantly improve your outlook.";
+  }
+
+  return { score, savingsRate, emergencyMonths, debtRatio, investmentRate, netWorth, burnRate, riskLevel, insights, redFlags, topActions, bestMove, worstMistake, summaryLine, heroHeadline, heroSubtext };
 }
 
 // FIRE calculation
