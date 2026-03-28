@@ -49,6 +49,11 @@ export interface FinancialHealth {
   insights: Insight[];
   redFlags: string[];
   topActions: string[];
+  bestMove: string;
+  worstMistake: string;
+  summaryLine: string;
+  heroHeadline: string;
+  heroSubtext: string;
 }
 
 export interface Insight {
