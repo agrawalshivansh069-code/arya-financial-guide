@@ -1,18 +1,16 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, AlertTriangle, Zap, ArrowRight } from "lucide-react";
+import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
+import HeroInsight from "@/components/HeroInsight";
 import InsightBadge from "@/components/InsightBadge";
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { analyzeFinancials, formatINR } from "@/lib/finance";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const riskColors = { Low: "text-success", Medium: "text-warning", High: "text-destructive" };
-const riskBadge = { Low: "bg-success/15 text-success border-success/30", Medium: "bg-warning/15 text-warning border-warning/30", High: "bg-destructive/15 text-destructive border-destructive/30" };
 
 export default function Dashboard() {
   const { financials, hasProfile, loading } = useFinancialProfile();
@@ -22,7 +20,6 @@ export default function Dashboard() {
   const analysis = useMemo(() => analyzeFinancials(financials), [financials]);
   const f = financials;
 
-  // Redirect to onboarding if no profile
   if (!loading && hasProfile === false) {
     navigate("/onboarding", { replace: true });
     return null;
@@ -36,8 +33,22 @@ export default function Dashboard() {
     );
   }
 
+  const score = Math.round(analysis.score);
   const overspend = f.monthlyExpenses - f.monthlyIncome * 0.5;
   const potentialSIPGain = (f.monthlyIncome * 0.3 - f.monthlySIP) * 12;
+
+  // Build hero headline
+  const heroHeadline = score >= 70
+    ? "Your finances are in great shape — keep it up!"
+    : score >= 45
+    ? `⚠ You are under-investing and may delay retirement by ${Math.max(1, Math.round((45 - score) / 5))}+ years`
+    : `🚨 Critical: Your financial health needs immediate attention`;
+
+  const heroSubtext = score >= 70
+    ? "Strong savings rate, healthy emergency fund, and good investment discipline."
+    : score >= 45
+    ? "Increase SIP contributions and reduce discretionary spending to get back on track."
+    : "High debt, low savings, and insufficient emergency fund. Take action now.";
 
   const metrics = [
     { label: "Net Worth", value: formatINR(analysis.netWorth), icon: Wallet, trend: "+12.4%", up: true },
@@ -55,14 +66,17 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground mt-1">Your financial command center</p>
       </motion.div>
 
-      {/* Insight Banner */}
+      {/* Hero Insight Card */}
+      <HeroInsight score={score} riskLevel={analysis.riskLevel} headline={heroHeadline} subtext={heroSubtext} />
+
+      {/* Alert Banners */}
       {overspend > 0 && (
         <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
           className="p-4 rounded-xl border border-warning/30 bg-warning/10 flex items-center justify-between"
         >
           <div>
-            <p className="text-sm font-semibold text-warning">⚠️ You are overspending by {formatINR(overspend * 12)}/year</p>
-            <p className="text-xs text-warning/70 mt-0.5">Your expenses exceed the 50% benchmark — reduce discretionary spending</p>
+            <p className="text-sm font-semibold text-warning">⚠️ Overspending by {formatINR(overspend * 12)}/year</p>
+            <p className="text-xs text-warning/70 mt-0.5">Expenses exceed the 50% benchmark — reduce discretionary spending</p>
           </div>
           <Badge className="bg-warning/20 text-warning border-warning/30">Action Needed</Badge>
         </motion.div>
@@ -103,11 +117,15 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Score + Risk */}
         <GlassCard delay={0.3} className="flex flex-col items-center justify-center">
-          <ScoreRing score={Math.round(analysis.score)} />
+          <ScoreRing score={score} />
           <div className="mt-4 flex items-center gap-2">
             <Shield className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">Risk Level:</span>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${riskBadge[analysis.riskLevel]}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${
+              analysis.riskLevel === "Low" ? "bg-success/15 text-success border-success/30" :
+              analysis.riskLevel === "Medium" ? "bg-warning/15 text-warning border-warning/30" :
+              "bg-destructive/15 text-destructive border-destructive/30"
+            }`}>
               {analysis.riskLevel}
             </span>
           </div>
