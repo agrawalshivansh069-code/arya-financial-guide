@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
 import HeroInsight from "@/components/HeroInsight";
 import InsightBadge from "@/components/InsightBadge";
+import EditFinancialData from "@/components/EditFinancialData";
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { analyzeFinancials, formatINR } from "@/lib/finance";
@@ -13,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
-  const { financials, hasProfile, loading } = useFinancialProfile();
+  const { financials, hasProfile, loading, saveProfile } = useFinancialProfile();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -37,19 +38,6 @@ export default function Dashboard() {
   const overspend = f.monthlyExpenses - f.monthlyIncome * 0.5;
   const potentialSIPGain = (f.monthlyIncome * 0.3 - f.monthlySIP) * 12;
 
-  // Build hero headline
-  const heroHeadline = score >= 70
-    ? "Your finances are in great shape — keep it up!"
-    : score >= 45
-    ? `⚠ You are under-investing and may delay retirement by ${Math.max(1, Math.round((45 - score) / 5))}+ years`
-    : `🚨 Critical: Your financial health needs immediate attention`;
-
-  const heroSubtext = score >= 70
-    ? "Strong savings rate, healthy emergency fund, and good investment discipline."
-    : score >= 45
-    ? "Increase SIP contributions and reduce discretionary spending to get back on track."
-    : "High debt, low savings, and insufficient emergency fund. Take action now.";
-
   const metrics = [
     { label: "Net Worth", value: formatINR(analysis.netWorth), icon: Wallet, trend: "+12.4%", up: true },
     { label: "Savings Rate", value: `${analysis.savingsRate.toFixed(1)}%`, icon: PiggyBank, trend: analysis.savingsRate >= 30 ? "Healthy" : "Low", up: analysis.savingsRate >= 30 },
@@ -59,15 +47,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="font-display text-2xl font-bold text-foreground">
-          Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""} 👋
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1">Your financial command center</p>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-foreground">
+            Welcome back{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ""} 👋
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">Your financial command center</p>
+        </div>
+        <EditFinancialData financials={financials} onSave={saveProfile} />
       </motion.div>
 
+      {/* Summary Line */}
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+        className="text-sm text-muted-foreground italic border-l-2 border-primary/40 pl-3"
+      >
+        {analysis.summaryLine}
+      </motion.p>
+
       {/* Hero Insight Card */}
-      <HeroInsight score={score} riskLevel={analysis.riskLevel} headline={heroHeadline} subtext={heroSubtext} />
+      <HeroInsight score={score} riskLevel={analysis.riskLevel} headline={analysis.heroHeadline} subtext={analysis.heroSubtext} />
 
       {/* Alert Banners */}
       {overspend > 0 && (
@@ -114,9 +112,27 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Best Move / Worst Mistake */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <GlassCard delay={0.25} className="border-success/20">
+          <div className="flex items-center gap-2 mb-3">
+            <CheckCircle className="w-5 h-5 text-success" />
+            <h3 className="font-display font-semibold text-foreground">✅ Best Move Right Now</h3>
+          </div>
+          <p className="text-sm text-foreground/80 leading-relaxed">{analysis.bestMove}</p>
+        </GlassCard>
+        <GlassCard delay={0.3} className="border-destructive/20">
+          <div className="flex items-center gap-2 mb-3">
+            <XCircle className="w-5 h-5 text-destructive" />
+            <h3 className="font-display font-semibold text-foreground">❌ Worst Mistake to Make</h3>
+          </div>
+          <p className="text-sm text-foreground/80 leading-relaxed">{analysis.worstMistake}</p>
+        </GlassCard>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Score + Risk */}
-        <GlassCard delay={0.3} className="flex flex-col items-center justify-center">
+        <GlassCard delay={0.35} className="flex flex-col items-center justify-center">
           <ScoreRing score={score} />
           <div className="mt-4 flex items-center gap-2">
             <Shield className="w-4 h-4 text-muted-foreground" />
