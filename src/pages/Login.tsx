@@ -29,9 +29,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 hero-glow">
       <motion.div
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
         className="w-full max-w-md glass-card rounded-2xl p-8"
       >
         <div className="flex items-center gap-3 mb-8">
@@ -41,7 +41,7 @@ export default function Login() {
           <span className="font-display font-bold text-foreground text-lg">AI Financial Copilot</span>
         </div>
 
-        <h2 className="font-display text-2xl font-bold text-foreground mb-2">Welcome back</h2>
+        <h2 className="font-display text-2xl font-bold text-foreground mb-1">Welcome back</h2>
         <p className="text-sm text-muted-foreground mb-6">Sign in to your account</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -61,8 +61,13 @@ export default function Login() {
               required minLength={6}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+          <Button type="submit" className="w-full gradient-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity" disabled={loading}>
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                Signing in...
+              </span>
+            ) : "Sign In"}
           </Button>
         </form>
 
@@ -71,7 +76,7 @@ export default function Login() {
           <Link to="/signup" className="text-primary hover:underline font-medium">Sign up</Link>
         </p>
         <p className="mt-2 text-center">
-          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground">← Back to home</Link>
+          <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to home</Link>
         </p>
       </motion.div>
     </div>
