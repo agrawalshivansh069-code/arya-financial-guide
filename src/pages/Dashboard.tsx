@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle, CheckCircle, XCircle, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
 import HeroInsight from "@/components/HeroInsight";
 import InsightBadge from "@/components/InsightBadge";
+import DetailedInsightCard from "@/components/DetailedInsightCard";
 import EditFinancialData from "@/components/EditFinancialData";
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useAuth } from "@/hooks/useAuth";
