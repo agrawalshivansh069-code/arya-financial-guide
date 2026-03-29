@@ -88,7 +88,7 @@ export default function Onboarding() {
                   <Input
                     type="number"
                     value={values[key] || ""}
-                    onChange={e => setValues(v => ({ ...v, [key]: Number(e.target.value) }))}
+                    onChange={e => setValues(v => ({ ...v, [key]: Math.max(0, Number(e.target.value) || 0) }))}
                     className={f.prefix ? "pl-8" : ""}
                     min={0}
                   />

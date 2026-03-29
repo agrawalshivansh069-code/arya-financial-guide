@@ -68,9 +68,14 @@ export default function AppSidebar() {
         </Button>
       </div>
 
-      <div className="p-4 mx-3 mb-4 glass-card rounded-xl">
+      <div className="p-4 mx-3 mb-2 glass-card rounded-xl">
         <p className="text-xs text-muted-foreground mb-1">Built for 🇮🇳 India</p>
         <p className="text-[10px] text-muted-foreground">SIP • ELSS • PPF • NPS • EPF</p>
+      </div>
+      <div className="px-4 mx-3 mb-4">
+        <p className="text-[9px] text-muted-foreground/60 text-center leading-relaxed">
+          Made by Shivansh Agrawal, Kundan Laturiya and Aayush Digambar
+        </p>
       </div>
     </aside>
   );

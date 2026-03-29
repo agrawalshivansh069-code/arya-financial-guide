@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { TrendingUp, TrendingDown, Shield, Wallet, PiggyBank, CreditCard, Zap, ArrowRight, AlertTriangle, CheckCircle, XCircle, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
 import ScoreRing from "@/components/ScoreRing";
 import HeroInsight from "@/components/HeroInsight";
 import InsightBadge from "@/components/InsightBadge";
+import DetailedInsightCard from "@/components/DetailedInsightCard";
 import EditFinancialData from "@/components/EditFinancialData";
 import { useFinancialProfile } from "@/hooks/useFinancialProfile";
 import { useAuth } from "@/hooks/useAuth";
@@ -158,6 +159,19 @@ export default function Dashboard() {
           ))}
         </GlassCard>
       </div>
+
+      {/* Detailed Insights & Action Plans */}
+      {analysis.detailedInsights.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-primary" />
+            <h3 className="font-display text-lg font-semibold text-foreground">Detailed Insights & Action Plans</h3>
+          </div>
+          {analysis.detailedInsights.map((insight, i) => (
+            <DetailedInsightCard key={i} insight={insight} index={i} />
+          ))}
+        </div>
+      )}
 
       {/* Red Flags + Top Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
