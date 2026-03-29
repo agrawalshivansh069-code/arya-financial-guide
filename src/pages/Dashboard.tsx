@@ -160,6 +160,19 @@ export default function Dashboard() {
         </GlassCard>
       </div>
 
+      {/* Detailed Insights & Action Plans */}
+      {analysis.detailedInsights.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-primary" />
+            <h3 className="font-display text-lg font-semibold text-foreground">Detailed Insights & Action Plans</h3>
+          </div>
+          {analysis.detailedInsights.map((insight, i) => (
+            <DetailedInsightCard key={i} insight={insight} index={i} />
+          ))}
+        </div>
+      )}
+
       {/* Red Flags + Top Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {analysis.redFlags.length > 0 && (
