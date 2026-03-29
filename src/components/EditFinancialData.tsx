@@ -79,7 +79,7 @@ export default function EditFinancialData({ financials, onSave }: Props) {
                 <Input
                   type="number"
                   value={values[f.key] ?? ""}
-                  onChange={e => setValues(v => ({ ...v, [f.key]: Number(e.target.value) }))}
+                  onChange={e => setValues(v => ({ ...v, [f.key]: Math.max(0, Number(e.target.value) || 0) }))}
                   className={f.prefix ? "pl-8" : ""}
                   min={0}
                 />
